@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Redirect, Route, Switch } from "react-router-dom";
 import Dashboard from "../components/dashboard/Dashboard";
@@ -5,6 +6,7 @@ import NotFound from "../utils/Errors/NotFound";
 import { today } from "../utils/date-time";
 import NewReservation from "../components/reservations/NewReservation";
 import { listReservations, useQuery } from "../utils/api";
+
 /**
  * Defines all the routes for the application.
  *
@@ -13,11 +15,9 @@ import { listReservations, useQuery } from "../utils/api";
  * @returns {JSX.Element}
  */
 function Routes() {
-  
   const query = useQuery();
   const [reservations, setReservations] = useState([]);
   const [reservationsError, setReservationsError] = useState(null);
-
   const date = query.get("date") ? query.get("date") : today();
 
   function loadDashboard() {
@@ -28,14 +28,12 @@ function Routes() {
       .catch(setReservationsError);
     return () => abortController.abort();
   }
-  
 
   useEffect(loadDashboard, [date]);
-  
 
   return (
     <Switch>
-
+      
       <Route exact={true} path="/reservations/new">
         <NewReservation loadDashboard={loadDashboard} />
       </Route>
@@ -57,7 +55,6 @@ function Routes() {
           loadDashboard={loadDashboard}
         />
       </Route>
-
       <Route exact={true} path="/">
         <Redirect to={`/dashboard?date=${date ? date : today()}`} />
       </Route>
