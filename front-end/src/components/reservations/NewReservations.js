@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useHistory } from "react-router";
 import { createReservation } from "../../utils/api";
 import ErrorAlert from "../../utils/Errors/ErrorAlert";
+import { asDateString } from "../../utils/date-time";
 
 function NewReservation(loadDashboard) {
   const history = useHistory();
@@ -76,11 +77,51 @@ function NewReservation(loadDashboard) {
       });
   };
 
-  useEffect(_dateCatch, [
-    newRes.reservation_date,
-    newRes.reservation_time,
-  ]);
 
+  const _timeCatch = () => {
+    const today = asDateString(new Date());
+    const now = new Date().getHours() * 100 + new Date().getMinutes();
+    const time = Number(
+      newRes.reservation_time.slice(0, 2) + newRes.reservation_time.slice(3)
+    );
+    const open = 1030;
+    const close = 2230;
+    const _timeString = (timeString) => {
+      timeString = timeString.toString();
+      if (timeString.length <= 2) timeString = "00" + timeString;
+      return timeString.slice(0, 2) + ":" + timeString.slice(2);
+    };
+    const messages = [
+      `Please enter a reservation date and time that is in the future.`,
+      `This time is before our restaurant is open, please enter a time after ${_timeString(
+        open
+      )}.`,
+      `Our restaurant closes at ${_timeString(
+        close
+      )}, please enter a time before ${_timeString(
+        close - 100
+      )} to allow your party the time to eat.`,
+    ];
+    if (today === newRes.reservation_date && time <= now) {
+      setError({
+        message: messages[0],
+      });
+    } else if (time < open && time > 0) {
+      setError({
+        message: messages[1],
+      });
+    } else if (time > close - 100) {
+      setError({
+        message: messages[2],
+      });
+    } else if (error && messages.includes(error.message)) {
+      setError(null);
+    }
+  };
+  
+  useEffect(_timeCatch, [newRes.reservation_date, newRes.reservation_time]);
+
+  useEffect(_dateCatch, [newRes.reservation_date, newRes.reservation_time]);
 
   const _submitHandler = (event) => {
     event.preventDefault();
