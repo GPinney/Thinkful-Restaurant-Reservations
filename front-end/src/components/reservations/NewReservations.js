@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { createReservation } from "../../utils/api";
-import ErrorAlert from "../../utils/Errors/ErrorAlert";
 import { asDateString } from "../../utils/date-time";
+import ErrorAlert from "../../utils/Errors/ErrorAlert";
 
-function NewReservation(loadDashboard) {
+
+export default function NewReservation(loadDashboard) {
   const history = useHistory();
 
   const defaultState = {
@@ -15,10 +16,8 @@ function NewReservation(loadDashboard) {
     reservation_time: "",
     people: "",
   };
-
   const [error, setError] = useState(null);
   const [newRes, setNewRes] = useState(defaultState);
-
   const _inputChange = (event) => {
     event.preventDefault();
     const inputValue = event.target.value;
@@ -47,7 +46,6 @@ function NewReservation(loadDashboard) {
         break;
     }
   };
-
   const _dateCatch = () => {
     const weekdays = [
       "Sunday",
@@ -76,8 +74,6 @@ function NewReservation(loadDashboard) {
         message: `Please enter a reservation date and time that is in the future.`,
       });
   };
-
-
   const _timeCatch = () => {
     const today = asDateString(new Date());
     const now = new Date().getHours() * 100 + new Date().getMinutes();
@@ -118,11 +114,9 @@ function NewReservation(loadDashboard) {
       setError(null);
     }
   };
-  
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(_timeCatch, [newRes.reservation_date, newRes.reservation_time]);
-
   useEffect(_dateCatch, [newRes.reservation_date, newRes.reservation_time]);
-
   const _submitHandler = (event) => {
     event.preventDefault();
     createReservation(newRes)
@@ -135,7 +129,8 @@ function NewReservation(loadDashboard) {
 
   return (
     <main>
-      <h1>NewReservation</h1>
+      
+      <h1>New Reservation</h1>
       <ErrorAlert error={error} />
       <div className="d-md-flex mb-3">
         <h4 className="mb-0">Enter Your Information Below</h4>
@@ -215,5 +210,3 @@ function NewReservation(loadDashboard) {
     </main>
   );
 }
-
-export default NewReservation;

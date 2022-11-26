@@ -67,7 +67,6 @@ const _validatePeople = (req, res, next) => {
       message: `Property is not valid number of people: ${people}`,
     });
 };
-
 const _validateTimeDate = async (req, res, next) => {
   const { reservation_date, reservation_time } = res.locals;
   const weekdays = [
@@ -81,22 +80,18 @@ const _validateTimeDate = async (req, res, next) => {
   ];
   const closedOn = 2;
   const resTimeDate = new Date(`${reservation_date}T${reservation_time}`);
-
   if (resTimeDate.getDay() === closedOn) {
     return next({
       status: 400,
       message: `We're sorry, the restaurant is closed on ${weekdays[closedOn]}s.`,
     });
   }
-
   if (resTimeDate < Date.now())
     return next({
       status: 400,
       message: `Please enter a reservation date and time that is in the future.`,
     });
-
-  next();
-};
+  }
 
 const _validateTimeSameDay = async (req, res, next) => {
   const _asDateString = (date) => {
@@ -104,12 +99,12 @@ const _validateTimeSameDay = async (req, res, next) => {
       .toString(10)
       .padStart(2, "0")}-${date.getDate().toString(10).padStart(2, "0")}`;
   }
-  const {reservation_time, reservation_date} = res.locals
+  
+  const { reservation_time, reservation_date } = res.locals;
   const today = _asDateString(new Date());
   const now = new Date().getHours() * 100 + new Date().getMinutes();
-  const time = Number(
-    reservation_time.slice(0, 2) + reservation_time.slice(3)
-  );
+ 
+  const time = Number(reservation_time.slice(0, 2) + reservation_time.slice(3));
   const open = 1030;
   const close = 2230;
   const _timeString = (timeString) => {
@@ -145,16 +140,14 @@ const _validateTimeSameDay = async (req, res, next) => {
     });
   }
 };
-
 //organizational middleware
-
-
 async function _createValidations(req, res, next) {
   _validateProperties(req, res, next);
   _storeProperties(req, res, next);
   _validateDate(req, res, next);
   _validateTime(req, res, next);
-  await _validateTimeSameDay(req, res, next)
+  
+  await _validateTimeSameDay(req, res, next);
   await _validateTimeDate(req, res, next);
   _validatePeople(req, res, next);
   next();
@@ -172,4 +165,4 @@ async function create(req, res) {
 module.exports = {
   list: [asyncErrorBoundary(list)],
   create: [asyncErrorBoundary(_createValidations), asyncErrorBoundary(create)],
-};
+}
