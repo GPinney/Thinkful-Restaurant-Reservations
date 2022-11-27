@@ -91,19 +91,16 @@ const _validateTimeDate = async (req, res, next) => {
       status: 400,
       message: `Please enter a reservation date and time that is in the future.`,
     });
-  }
-
+};
 const _validateTimeSameDay = async (req, res, next) => {
   const _asDateString = (date) => {
     return `${date.getFullYear().toString(10)}-${(date.getMonth() + 1)
       .toString(10)
       .padStart(2, "0")}-${date.getDate().toString(10).padStart(2, "0")}`;
-  }
-  
+  };
   const { reservation_time, reservation_date } = res.locals;
   const today = _asDateString(new Date());
   const now = new Date().getHours() * 100 + new Date().getMinutes();
- 
   const time = Number(reservation_time.slice(0, 2) + reservation_time.slice(3));
   const open = 1030;
   const close = 2230;
@@ -140,13 +137,27 @@ const _validateTimeSameDay = async (req, res, next) => {
     });
   }
 };
+
+const _validateId = async (req, res, next) => {
+  const { reservation_id } = req.params;
+  const reservation = await service.listById(reservation_id);
+  if (!reservation) {
+    return next({
+      status: 404,
+      message: `reservation_id ${reservation_id} does not exist`,
+    });
+  }
+  res.locals.reservation = reservation;
+  next()
+};
+
 //organizational middleware
+
 async function _createValidations(req, res, next) {
   _validateProperties(req, res, next);
   _storeProperties(req, res, next);
   _validateDate(req, res, next);
   _validateTime(req, res, next);
-  
   await _validateTimeSameDay(req, res, next);
   await _validateTimeDate(req, res, next);
   _validatePeople(req, res, next);
@@ -162,7 +173,14 @@ async function create(req, res) {
   const response = await service.create(req.body.data);
   res.status(201).json({ data: response });
 }
+
+async function listById(req, res) {
+  const { reservation } = res.locals;
+  res.status(200).json({ data: reservation[0] });
+}
+
 module.exports = {
   list: [asyncErrorBoundary(list)],
   create: [asyncErrorBoundary(_createValidations), asyncErrorBoundary(create)],
-}
+  listById: [asyncErrorBoundary(_validateId), asyncErrorBoundary(listById)],
+};

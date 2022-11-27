@@ -1,12 +1,10 @@
 const db = require("../db/connection");
-
 function create(reservation) {
   return db("reservations")
     .insert(reservation)
     .returning("*")
     .then((createdRecords) => createdRecords[0]);
 }
-
 function list(date) {
   return db("reservations")
     .select("*")
@@ -14,7 +12,15 @@ function list(date) {
     .orderBy("reservation_time");
 }
 
+function listById(reservation_id) {
+  return db("reservations")
+    .select("*")
+    .where({ reservation_id: reservation_id })
+    .orderBy("reservation_time");
+}
+
 module.exports = {
   create,
   list,
+  listById,
 };
