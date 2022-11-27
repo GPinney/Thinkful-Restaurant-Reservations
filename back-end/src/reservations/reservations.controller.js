@@ -174,8 +174,20 @@ async function listById(req, res) {
   const { reservation } = res.locals;
   res.status(200).json({ data: reservation[0] });
 }
+async function updateStatus(req, res) {
+  const { reservation } = res.locals;
+  const { status, reservation_id } = reservation;
+  let data = null;
+  if (status === "booked") data = await service.toSeated(reservation_id);
+  res.status(200).json({ data: reservation });
+}
+
 module.exports = {
   list: [asyncErrorBoundary(list)],
   create: [asyncErrorBoundary(_createValidations), asyncErrorBoundary(create)],
   listById: [asyncErrorBoundary(_validateId), asyncErrorBoundary(listById)],
+  updateStatus: [
+    asyncErrorBoundary(_validateId),
+    asyncErrorBoundary(updateStatus),
+  ],
 };

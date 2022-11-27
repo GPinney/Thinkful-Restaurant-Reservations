@@ -1,15 +1,6 @@
 /**
- * Defines the base URL for the API.
- * The default values is overridden by the `API_BASE_URL` environment variable.
+ * Defines the default headers for these functions to work with `json-server`
  */
- import { useLocation } from "react-router";
- import formatReservationDate from "./format-reservation-date";
- import formatReservationTime from "./format-reservation-date";
- const API_BASE_URL =
-   process.env.REACT_APP_API_BASE_URL || "http://localhost:5000";
- /**
-  * Defines the default headers for these functions to work with `json-server`
-  */
  const headers = new Headers();
  headers.append("Content-Type", "application/json");
  /**
@@ -28,8 +19,10 @@
   *  If the response is not in the 200 - 399 range the promise is rejected.
   */
  async function fetchJson(url, options, onCancel) {
+   console.log("Fetching");
    try {
      const response = await fetch(url, options);
+ 
      if (response.status === 204) {
        return null;
      }
@@ -46,8 +39,14 @@
      return Promise.resolve(onCancel);
    }
  }
+ 
+ export function useQuery() {
+   return new URLSearchParams(useLocation().search);
+ }
+ 
  /**
-  * Retrieves all existing reservation.
+  
+  * Retrieves all existing reservations.
   * @returns {Promise<[reservation]>}
   *  a promise that resolves to a possibly empty array of reservation saved in the database.
   */
@@ -62,21 +61,18 @@
      .then(formatReservationDate)
      .then(formatReservationTime);
  }
- 
  export async function listReservationsById(params, signal) {
    const url = new URL(`${API_BASE_URL}/reservations/${params.reservation_id}`);
    return await fetchJson(url, { headers, signal, method: "GET" }, []);
  }
- 
  export async function listTables(signal) {
    const url = new URL(`${API_BASE_URL}/tables`);
    return await fetchJson(url, { headers, signal }, []);
  }
  
- export function useQuery() {
-   return new URLSearchParams(useLocation().search);
- }
+ 
  export async function createReservation(reservation, signal) {
+   console.log("Creating Reservation");
    const url = `${API_BASE_URL}/reservations/new`;
    const options = {
      method: "POST",
@@ -86,7 +82,6 @@
    };
    return await fetchJson(url, options);
  }
- 
  export async function createTable(table, signal) {
    const url = `${API_BASE_URL}/tables`;
    const body = JSON.stringify({ data: table });
@@ -95,11 +90,16 @@
  
  export async function editTable(table, reservation_id, signal) {
    const url = `${API_BASE_URL}/tables/${table.table_id}/seat`;
-   const body = JSON.stringify({ data: {reservation_id: reservation_id} });
+   const body = JSON.stringify({ data: { reservation_id: reservation_id } });
    return await fetchJson(url, { headers, signal, method: "PUT", body }, []);
  }
-
+ 
+ export async function seatReservation(reservation_id, signal) {
+   const url = new URL(`${API_BASE_URL}/reservations/${reservation_id}`);
+   return await fetchJson(url, { headers, signal, method: "PUT" }, []);
+ }
+ 
  export async function freeTable(table, signal) {
-  const url = `${API_BASE_URL}/tables/${table.table_id}/seat`;
-  return await fetchJson(url, { headers, signal, method: "DELETE" }, []);
-}
+   const url = `${API_BASE_URL}/tables/${table.table_id}/seat`;
+   return await fetchJson(url, { headers, signal, method: "DELETE" }, []);
+ }
