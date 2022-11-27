@@ -5,15 +5,12 @@ function create(table) {
     .returning("*")
     .then((createdRecords) => createdRecords[0]);
 }
-
 function list() {
   return db("tables").select("*").orderBy("table_name");
 }
-
 function listById(table_id) {
   return db("tables").select("*").where({ table_id: table_id }).first();
 }
-
 function listResById(reservation_id) {
   return db("reservations")
     .select("*")
@@ -22,9 +19,11 @@ function listResById(reservation_id) {
 }
 
 function occupy(table_id) {
-  return db("tables")
-    .where({ table_id: table_id })
-    .update({ occupied: true });
+  return db("tables").where({ table_id: table_id }).update({ occupied: true });
+}
+
+function free(table_id) {
+  return db("tables").where({ table_id: table_id }).update({ occupied: false });
 }
 
 module.exports = {
@@ -33,4 +32,5 @@ module.exports = {
   listById,
   listResById,
   occupy,
+  free,
 };

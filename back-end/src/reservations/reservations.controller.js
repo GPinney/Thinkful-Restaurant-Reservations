@@ -137,11 +137,10 @@ const _validateTimeSameDay = async (req, res, next) => {
     });
   }
 };
-
 const _validateId = async (req, res, next) => {
   const { reservation_id } = req.params;
   const reservation = await service.listById(reservation_id);
-  if (!reservation) {
+  if (!reservation || reservation.length === 0) {
     return next({
       status: 404,
       message: `reservation_id ${reservation_id} does not exist`,
@@ -150,9 +149,7 @@ const _validateId = async (req, res, next) => {
   res.locals.reservation = reservation;
   next()
 };
-
 //organizational middleware
-
 async function _createValidations(req, res, next) {
   _validateProperties(req, res, next);
   _storeProperties(req, res, next);
@@ -173,12 +170,10 @@ async function create(req, res) {
   const response = await service.create(req.body.data);
   res.status(201).json({ data: response });
 }
-
 async function listById(req, res) {
   const { reservation } = res.locals;
   res.status(200).json({ data: reservation[0] });
 }
-
 module.exports = {
   list: [asyncErrorBoundary(list)],
   create: [asyncErrorBoundary(_createValidations), asyncErrorBoundary(create)],
