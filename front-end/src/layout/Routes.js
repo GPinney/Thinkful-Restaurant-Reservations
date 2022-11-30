@@ -7,6 +7,7 @@ import NewReservation from "../components/reservations/NewReservation";
 import { listReservations, listTables, useQuery } from "../utils/api";
 import NewTable from "../components/tables/NewTable";
 import Seating from "../components/reservations/Seating";
+import Search from "../components/search/Search";
 
 /**
  * Defines all the routes for the application.
@@ -79,6 +80,10 @@ function Routes() {
           tablesError={tablesError}
           loadDashboard={loadDashboard}
         />
+      </Route>
+
+      <Route path="/search">
+        <Search />
       </Route>
 
       <Route exact={true} path="/">

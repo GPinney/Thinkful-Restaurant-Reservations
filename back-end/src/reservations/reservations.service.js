@@ -19,6 +19,12 @@ function listById(reservation_id) {
     .where({ reservation_id: reservation_id })
     .orderBy("reservation_time");
 }
+function listMobile(mobile_number) {
+    return db("reservations")
+      .select("*")
+      .where("mobile_number", "like", `${mobile_number}%`)
+      .orderBy("reservation_time");
+  }
 function toSeated(reservation_id) {
   return db("reservations")
     .where({ reservation_id: reservation_id })
@@ -38,6 +44,7 @@ module.exports = {
   create,
   list,
   listById,
+  listMobile,
   toBooked,
   toSeated,
   toFinished,
