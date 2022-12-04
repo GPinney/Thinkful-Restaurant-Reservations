@@ -3,21 +3,19 @@ import ErrorAlert from "../../utils/Errors/ErrorAlert";
 import { next, previous, today } from "../../utils/date-time";
 import ReservationDisplay from "../reservations/ReservationDisplay";
 import TablesDisplay from "../tables/TablesDisplay";
-
 /**
  * Defines the dashboard page.
  * @param date
  *  the date for which the user wants to view reservations.
  * @returns {JSX.Element}
  */
-
 export default function Dashboard({
   date,
   reservations,
   reservationsError,
   tables,
   tablesError,
-  loadDashboard
+  loadDashboard,
 }) {
   const history = useHistory();
 
@@ -30,22 +28,34 @@ export default function Dashboard({
         </h4>
       </div>
 
-      <ReservationDisplay reservations={reservations} loadDashboard={loadDashboard} />
+      <ReservationDisplay
+        reservations={reservations}
+        loadDashboard={loadDashboard}
+      />
       <TablesDisplay tables={tables} loadDashboard={loadDashboard} />
 
       <div>
-        <input
+        
+        <button
           type="button"
+          name="yesterday"
+          id="yesterday"
           value="Previous Day"
           onClick={() => history.push(`/dashboard?date=${previous(date)}`)}
         />
-        <input
+        
+        <button
           type="button"
+          name="today"
+          id="today"
           value="Today"
           onClick={() => history.push(`/dashboard?date=${today()}`)}
         />
-        <input
+        
+        <button
           type="button"
+          name="tomorrow"
+          id="tomorrow"
           value="Next Day"
           onClick={() => history.push(`/dashboard?date=${next(date)}`)}
         />

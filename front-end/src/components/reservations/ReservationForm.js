@@ -7,10 +7,8 @@ import {
 } from "../../utils/api";
 import { asDateString } from "../../utils/date-time";
 import ErrorAlert from "../../utils/Errors/ErrorAlert";
-
 export default function ReservationEditor({ loadDashboard }) {
   const history = useHistory();
-
   const { reservation_id } = useParams();
   const { href } = window.location;
   const defaultState = {
@@ -20,12 +18,11 @@ export default function ReservationEditor({ loadDashboard }) {
     reservation_date: "",
     reservation_time: "",
     people: "",
-    status: "new",
+    status: "booked",
   };
 
   const [error, setError] = useState(null);
   const [newRes, setNewRes] = useState(defaultState);
-
   useEffect(() => {
     let isMounted = true;
     if (!reservation_id)
@@ -47,7 +44,6 @@ export default function ReservationEditor({ loadDashboard }) {
       isMounted = false;
     };
   }, [reservation_id]);
-
   useEffect(() => {
     if (href.includes("reservations/new"))
       setNewRes({
@@ -57,12 +53,13 @@ export default function ReservationEditor({ loadDashboard }) {
         reservation_date: "",
         reservation_time: "",
         people: "",
-        status: "new",
+        status: "booked",
       });
   }, [href]);
 
   const _inputChange = (event) => {
     event.preventDefault();
+    setError(null);
     const inputValue = event.target.value;
     const inputId = event.target.name;
     switch (inputId) {
@@ -158,8 +155,9 @@ export default function ReservationEditor({ loadDashboard }) {
     }
   };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(_timeCatch, [newRes.reservation_date, newRes.reservation_time]);
-  useEffect(_dateCatch, [newRes.reservation_date, newRes.reservation_time]);
+  useEffect(_timeCatch, [newRes]);
+
+  useEffect(_dateCatch, [newRes]);
 
   const _submitHandler = (event) => {
     event.preventDefault();
@@ -179,12 +177,10 @@ export default function ReservationEditor({ loadDashboard }) {
         .catch(setError);
     }
   };
-
   const FormHeader = () => {
     if (reservation_id) return <h1>Edit Reservation</h1>;
     return <h1>New Reservation</h1>;
   };
-
   return (
     <main>
       <FormHeader />
@@ -261,8 +257,19 @@ export default function ReservationEditor({ loadDashboard }) {
           onChange={_inputChange}
           value={newRes.people}
         />
-        <input type="submit" value="Confirm Reservation" />
-        <input type="button" value="Cancel" onClick={() => history.goBack()} />
+        <button
+          type="submit"
+          id="submit"
+          name="submit"
+          value="Confirm Reservation"
+        />
+        <button
+          type="button"
+          id="cancel"
+          name="cancel"
+          value="Cancel"
+          onClick={() => history.goBack()}
+        />
       </form>
     </main>
   );

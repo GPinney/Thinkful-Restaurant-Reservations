@@ -102,7 +102,7 @@
    const body = JSON.stringify({ data: { status: new_status } });
    return await fetchJson(url, { headers, signal, method: "PUT", body }, []);
  }
- 
+
  export async function editReservation(updated_reservation, signal) {
   const url = new URL(
     `${API_BASE_URL}/reservations/${updated_reservation.reservation_id}/edit`
@@ -112,6 +112,6 @@
 }
 
  export async function freeTable(table, signal) {
-   const url = `${API_BASE_URL}/tables/${table.table_id}/seat`;
+   const url = new URL(`${API_BASE_URL}/reservations/${reservation_id}/status`);
    return await fetchJson(url, { headers, signal, method: "DELETE" }, []);
  }
