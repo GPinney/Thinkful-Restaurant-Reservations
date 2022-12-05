@@ -1,6 +1,8 @@
 const service = require("./reservations.service");
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
+
 //functional middleware
+
 const _validateProperties = (req, res, next) => {
   const reservation = req.body.data;
   if (!reservation)
@@ -22,6 +24,7 @@ const _validateProperties = (req, res, next) => {
     }
   }
 };
+
 const _storeProperties = (req, res, next) => {
   const {
     first_name,
@@ -38,6 +41,7 @@ const _storeProperties = (req, res, next) => {
   res.locals.reservation_time = reservation_time;
   res.locals.people = people;
 };
+
 const _validateDate = (req, res, next) => {
   const { reservation_date } = res.locals;
   if (!typeof reservation_date === "string" || /[^\d|-]/.test(reservation_date))
@@ -46,6 +50,7 @@ const _validateDate = (req, res, next) => {
       message: `Property is not a valid reservation_date: ${reservation_date}`,
     });
 };
+
 const _validateTime = (req, res, next) => {
   const { reservation_time } = res.locals;
   if (!typeof reservation_time === "string" || /[^\d|:]/.test(reservation_time))
@@ -54,6 +59,7 @@ const _validateTime = (req, res, next) => {
       message: `Property is not a valid reservation_time: ${reservation_time}`,
     });
 };
+
 const _validatePeople = (req, res, next) => {
   const { people } = res.locals;
   if (
@@ -67,6 +73,7 @@ const _validatePeople = (req, res, next) => {
       message: `Property is not valid number of people: ${people}`,
     });
 };
+
 const _validateStatus = (req, res, next) => {
   const { status } = req.body.data;
   if (!status) req.body.data.status = "booked";
@@ -76,6 +83,7 @@ const _validateStatus = (req, res, next) => {
       message: `New reservation must be initialized as booked, this reservation is initialized at ${status}`,
     });
 };
+
 const _validateTimeDate = async (req, res, next) => {
   const { reservation_date, reservation_time } = res.locals;
   const weekdays = [
@@ -89,18 +97,21 @@ const _validateTimeDate = async (req, res, next) => {
   ];
   const closedOn = 2;
   const resTimeDate = new Date(`${reservation_date}T${reservation_time}`);
+
   if (resTimeDate.getDay() === closedOn) {
     return next({
       status: 400,
       message: `We're sorry, the restaurant is closed on ${weekdays[closedOn]}s.`,
     });
   }
+
   if (resTimeDate < Date.now())
     return next({
       status: 400,
       message: `Please enter a reservation date and time that is in the future.`,
     });
 };
+
 const _validateTimeSameDay = async (req, res, next) => {
   const _asDateString = (date) => {
     return `${date.getFullYear().toString(10)}-${(date.getMonth() + 1)
@@ -146,6 +157,7 @@ const _validateTimeSameDay = async (req, res, next) => {
     });
   }
 };
+
 const _validateId = async (req, res, next) => {
   const { reservation_id } = req.params;
   const reservation = await service.listById(reservation_id);
@@ -167,7 +179,6 @@ const _validateStatusUpdate = (req, res, next) => {
       status: 400,
       message: `Must have a status property`,
     });
-
   if (!validStatuses.includes(status))
     next({
       status: 400,
@@ -178,7 +189,6 @@ const _validateStatusUpdate = (req, res, next) => {
 const _validateUnfinished = (req, res, next) => {
   const { status } = res.locals.reservation[0];
 
-  
   if (status === "finished" || status === "cancelled")
     next({
       status: 400,
@@ -187,7 +197,9 @@ const _validateUnfinished = (req, res, next) => {
 
   res.locals.status = status;
 };
+
 //organizational middleware
+
 async function _createValidations(req, res, next) {
   _validateProperties(req, res, next);
   _storeProperties(req, res, next);
@@ -199,10 +211,12 @@ async function _createValidations(req, res, next) {
   _validateStatus(req, res, next);
   next();
 }
+
 async function _listByIdValidation(req, res, next) {
   await _validateId(req, res, next);
   next();
 }
+
 async function _updateStatusValidations(req, res, next) {
   await _validateId(req, res, next);
   _validateStatusUpdate(req, res, next);
@@ -236,14 +250,17 @@ async function list(req, res) {
 
   res.json({ data: reservations });
 }
+
 async function create(req, res) {
   const response = await service.create(req.body.data);
   res.status(201).json({ data: response });
 }
+
 async function listById(req, res) {
   const { reservation } = res.locals;
   res.status(200).json({ data: reservation[0] });
 }
+
 async function updateStatus(req, res) {
   const { reservation_id } = req.params;
   const { status } = req.body.data;

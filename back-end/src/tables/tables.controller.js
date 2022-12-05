@@ -1,6 +1,8 @@
 const asyncErrorBoundary = require("../errors/asyncErrorBoundary");
 const service = require("./tables.service");
+
 //functional middleware
+
 const _validateProperties = (req, res, next) => {
   const table = req.body.data;
   if (!table) return next({ status: 400, message: "Body of data required" });
@@ -14,11 +16,13 @@ const _validateProperties = (req, res, next) => {
     }
   }
 };
+
 const _storeProperties = (req, res, next) => {
   const { table_name, capacity } = req.body.data;
   res.locals.table_name = table_name;
   res.locals.capacity = capacity;
 };
+
 const _validateName = (req, res, next) => {
   if (res.locals.table_name.length <= 1)
     next({
@@ -26,6 +30,7 @@ const _validateName = (req, res, next) => {
       message: `Length of property 'table_name' must be greater than 1 character.`,
     });
 };
+
 const _validateCapacity = (req, res, next) => {
   if (typeof res.locals.capacity !== "number" || isNaN(res.locals.capacity))
     next({ status: 400, message: `Property 'capacity' must be a number.` });
@@ -35,9 +40,11 @@ const _validateCapacity = (req, res, next) => {
       message: `Property 'capacity' must be greater than 0.`,
     });
 };
+
 const _validateOccupied = (req, res, next) => {
   if (!req.body.data.occupied) req.body.data.occupied = false;
 };
+
 const _validateReservationId = async (req, res, next) => {
   let { reservation_id } = req.body.data;
   if (!reservation_id)
@@ -59,13 +66,13 @@ const _validateReservationId = async (req, res, next) => {
 const _listById = async (req, res, next) => {
   const { table_id } = req.params;
   const table = await service.listById(table_id);
+
   if (!table) {
     return next({
       status: 404,
       message: `table id ${table_id} does not exist`,
     });
   }
-  
   let { occupied, capacity, reservation_id } = table;
   res.locals.occupied = occupied;
   res.locals.capacity = capacity;
@@ -79,6 +86,7 @@ const _validateSeatCapacity = (req, res, next) => {
       message: "The table you have selected is currently occupied.",
     });
   }
+
   if (res.locals.capacity < res.locals.people) {
     return next({
       status: 400,
@@ -109,6 +117,7 @@ async function _createValidations(req, res, next) {
   _validateOccupied(req, res, next);
   next();
 }
+
 async function _occupyValidations(req, res, next) {
   await _validateReservationId(req, res, next);
   await _listById(req, res, next);
@@ -124,10 +133,12 @@ async function _freeValidations(req, res, next) {
 }
 
 //executive functions
+
 async function create(req, res) {
   const response = await service.create(req.body.data);
-  res.status(201).json({ data: response });
+  res.status(201).json({ data: response[0] });
 }
+
 async function list(req, res) {
   const data = await service.list();
   res.json({ data });
@@ -144,7 +155,7 @@ async function free(req, res) {
   const { table_id } = req.params;
   let { reservation_id } = res.locals;
   const data = await service.free(table_id, reservation_id);
-  res.sendStatus(200);
+  res.status(200).json({data: data});
 }
 
 module.exports = {

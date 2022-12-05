@@ -2,17 +2,17 @@ const db = require("../db/connection");
 const { toSeated } = require("../reservations/reservations.service");
 
 function create(table) {
-  return db("tables")
-    .insert(table)
-    .returning("*")
-    .then((createdRecords) => createdRecords[0]);
+  return db("tables").insert(table).returning("*");
 }
+
 function list() {
   return db("tables").select("*").orderBy("table_name");
 }
+
 function listById(table_id) {
   return db("tables").select("*").where({ table_id: table_id }).first();
 }
+
 function listResById(reservation_id) {
   return db("reservations")
     .select("*")
@@ -38,7 +38,6 @@ function occupy(table_id, reservation_id) {
       });
   });
 }
-
 
 function free(table_id, reservation_id) {
   return db.transaction(function (transaction) {

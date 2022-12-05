@@ -3,7 +3,7 @@ import { useHistory, useParams } from "react-router";
 import { editTable, listReservationsById } from "../../utils/api";
 import ErrorAlert from "../../utils/Errors/ErrorAlert";
 
-export default function Seating({ tables, loadDasboard }) {
+export default function Seating({ tables, loadDashboard }) {
   const { reservation_id } = useParams();
   const history = useHistory();
 
@@ -65,46 +65,73 @@ export default function Seating({ tables, loadDasboard }) {
 
   const _submitHandler = (event) => {
     event.preventDefault();
+    const abortController = new AbortController()
     if (error) return null;
     editTable(currentTable, reservation_id)
-      .then(loadDasboard)
+      .then(loadDashboard)
       .then(() => {
         history.push("/dashboard");
       })
       .catch(setError);
+    return () => abortController.abort
   };
 
   if (!tables || !reservation) return <h3>Missing Tables or Reservation</h3>;
 
   return (
-    <form onSubmit={_submitHandler}>
-      <label htmlFor="table_id"> Table Number: </label>
-      <select
-        name="table_id"
-        id="table_id"
-        required={true}
-        onChange={_inputChange}
-      >
-        {tables.map((t, index) => {
-          return (
-            <option
-              key={index}
-              value={`${t.table_id}_ ${t.table_name}_ ${t.capacity}`}
+    <div>
+      <div className="d-flex mb-1 justify-content-center">
+        <h1>Seating</h1>
+      </div>
+      <form onSubmit={_submitHandler}>
+        <div className="row">
+          <div className="col-2"></div>
+          <div className="col">
+            <div className="d-flex mt-1 justify-content-center">
+              <label htmlFor="table_id"> Table Number: </label>
+            </div>
+            <select
+              name="table_id"
+              id="table_id"
+              className="form-control minw100"
+              required={true}
+              onChange={_inputChange}
             >
-              {t.table_name} - {t.capacity}
-            </option>
-          );
-        })}
-      </select>
-      <button type="submit" name="submit" id="submit" value="Submit" />
-      <button
-        type="button"
-        name="cancel"
-        id="cancel"
-        value="Cancel"
-        onClick={() => history.goBack()}
-      />
-      <ErrorAlert error={error} />
-    </form>
+              {tables.map((t, index) => {
+                return (
+                  <option
+                    key={index}
+                    value={`${t.table_id}_ ${t.table_name}_ ${t.capacity}`}
+                  >
+                    {t.table_name} - {t.capacity}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+          <div className="col-2"></div>
+        </div>
+        <div className="row mt-3">
+          <div className="col-4"></div>
+          <button
+            type="submit"
+            className="btn btn-a border-a col minw100"
+            name="submit"
+          >
+            Submit
+          </button>
+          <button
+            type="button"
+            className="btn btn-warn border-warn col minw100"
+            name="cancel"
+            onClick={() => history.goBack()}
+          >
+            Cancel
+          </button>
+          <div className="col-4"></div>
+        </div>
+        <ErrorAlert error={error} />
+      </form>
+    </div>
   );
 }
