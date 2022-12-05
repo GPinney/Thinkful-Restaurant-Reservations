@@ -41,31 +41,31 @@ h5 {
 
 .btn-a {
   color: #393a44;
-  background-color: #de89be;
+  background-color: #6D67E4;
 }
 
 .border-a {
-  border: 1px solid #bf368a;
+  border: 1px solid #9F73AB;
 }
 
 .border-a:hover {
-  border: 1px solid #de89be;
+  border: 1px solid #6D67E4;
 }
 
 .btn-a:hover {
-  background-color: #bf368a;
+  background-color: #9F73AB;
 }
 
 .btn-warn {
-  background-color: #bf211e;
+  background-color: #EB6440;
   color: #d9bfd3;
-  border: 1px solid #8d1816;
+  border: 1px solid #C84B31;
 }
 
 .btn-warn:hover {
-  background-color: #8d1816;
+  background-color: #C84B31;
   color: #d9bfd3;
-  border: 1px solid #bf211e;
+  border: 1px solid #EB6440;
 }
 
 .form-control {
