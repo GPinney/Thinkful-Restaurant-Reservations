@@ -62,13 +62,13 @@ export default function Dashboard({
         </button>
         <button
           type="button"
-          name="tomorrow"
-          id="tomorrow"
+          name="next day"
+          id="next day"
           className="btn btn-a border-a border-left-0"
           value="Next Day"
           onClick={() => history.push(`/dashboard?date=${next(date)}`)}
         >
-          Tomorrow
+          Next Day
         </button>
       </div>
       <ErrorAlert error={reservationsError} />

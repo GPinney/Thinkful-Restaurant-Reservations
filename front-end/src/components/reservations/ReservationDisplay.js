@@ -59,7 +59,7 @@ export default function ReservationDisplay({ reservations, loadDashboard }) {
     return (
       <li className="list-group-item" key={r.reservation_id}>
         <h5 className="lgi-interior">
-          {r.last_name}, {r.first_name} will arrive at {r.reservation_time}
+          {r.last_name}, {r.first_name} will arrive at {r.reservation_time}, phone number {r.mobile_number}
         </h5>
         <h5
           className="lgi-interior"
